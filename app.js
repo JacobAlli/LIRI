@@ -87,27 +87,45 @@ function spotifyThisSong(songName){
 };
 
 function movieResults(movieName){
+    if(!movieName){
+    	movieName = 'Mr+Nobody';
+    }
+
     request('http://www.omdbapi.com/?apikey=trilogy&t='+movieName+'&plot=full', function(err, data, body){
         if(err){
             console.log(err);
         }
-        var movieData = JSON.parse(data.body);
-        console.log(' ');
-        console.log('Here\'s some info on your movie:');
-        console.log(' ');
-        console.log('Movie Title: '+movieData.Title);
-        console.log('Released: '+movieData.Released);
+        else{
+	    	var movieData = JSON.parse(data.body);
+	        console.log(' ');
+	        console.log('Here\'s some info on your movie:');
+	        console.log(' ');
+	        console.log('Movie Title: '+movieData.Title);
+	        console.log('Released: '+movieData.Released);
 
-        checkForRatings('Internet Movie Database', movieData);
-        checkForRatings('Rotten Tomatoes', movieData);
+	        checkForRatings('Internet Movie Database', movieData);
+	        checkForRatings('Rotten Tomatoes', movieData);
 
-        console.log('Country: '+movieData.Country);
-        console.log('Language: '+movieData.Language);
-        console.log('Plot: '+movieData.Plot);
-        console.log('Cast: '+movieData.Actors);
-        console.log(' ');
+	        console.log('Country: '+movieData.Country);
+	        console.log('Language: '+movieData.Language);
+	        console.log('Plot: '+movieData.Plot);
+	        console.log('Cast: '+movieData.Actors);
+	        console.log(' ');
+    	}
     })
 };
+
+function doWhatItSays(){
+	fs.readFile('random.txt', 'utf8', function(err, data){
+		if(err){
+			console.log(err);
+		}
+		liriCmd = data.split(',')[0];
+		console.log(liriCmd);
+		name = data.split(',')[1];
+		console.log(name);
+	})
+}
 
 function checkForRatings(vendor, movieData){
     do{
@@ -138,6 +156,23 @@ function noTrackResults(){
 };
 
 switch(liriCmd){
+	case 'do-what-it-says':
+		fs.readFile('random.txt' ,'utf8', function(err, data){
+			switch(data.split(',')[0]){
+				case 'spotify-this-song':
+					spotifyThisSong(data.split(',')[1]);
+					break;
+				case 'my-tweets':
+					myTweets();
+					break;
+				case 'movie-this':
+					movieResults(data.split(',')[1]);
+					break;
+				default:
+					console.log('invalid data in your .txt file');
+			};
+		});
+		break;
     case 'my-tweets':
         myTweets();
         break;
@@ -150,6 +185,7 @@ switch(liriCmd){
     default:
         console.log("command is not valid, try again!");
 };
+
 
 
 
